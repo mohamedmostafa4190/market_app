@@ -99,7 +99,7 @@ class _LoginViewState extends State<LoginView> {
                                 buildTextButton(
                                   text: 'Forget Password',
                                   onTap: () {
-                                    Navigator.pushNamed(context, '/forget');
+                                    Navigator.pushNamed(context, '/reset-password');
                                   },
                                 ),
                                 const SizedBox(width: 10),

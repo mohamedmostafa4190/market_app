@@ -30,4 +30,6 @@ class PaddingConstants {
 const projectURL = 'https://bfimgpvfvthhkeikxers.supabase.co';
 const projectAPIKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmaW1ncHZmdnRoaGtlaWt4ZXJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Nzg0MzIsImV4cCI6MjA2OTU1NDQzMn0.p3zNhNuyK_i2-PW3DNXL7aUVLSK1MQf-C-U7g-qSFco';
+const webClientId =
+    '20112591439-9455102e40cg3jv077hqnlj7kmns5nvh.apps.googleusercontent.com';
 final supabaseClient = Supabase.instance.client;
