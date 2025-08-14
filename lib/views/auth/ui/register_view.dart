@@ -32,14 +32,18 @@ class _RegisterViewState extends State<RegisterView> {
   Widget build(BuildContext context) {
     return BlocConsumer<AppAuthCubit, AppAuthStates>(
       listener: (context, state) {
-        if (state is RegisterScreenSuccess) {
+        if (state is RegisterScreenSuccess || state is LoginWithGoogleSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registration Successful!')),
           );
-          Navigator.pushReplacementNamed(context, '/login');
-        } else if (state is RegisterScreenError) {
+          Navigator.pushReplacementNamed(context, '/home');
+        } else if (state is RegisterScreenError ||
+            state is LoginWithGoogleError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Error To Login'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       },
@@ -49,118 +53,131 @@ class _RegisterViewState extends State<RegisterView> {
           body: SafeArea(
             child: Form(
               key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Welcome To Market',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 30),
-                  Card(
-                    margin: const EdgeInsets.all(24),
-                    color: AppColors.kWhiteColor,
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          buildTextFormField(
-                            keyboardType: TextInputType.text,
-                            controller: nameController,
-                            label: 'Name',
-                          ),
-                          const SizedBox(height: 15),
-                          buildTextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            controller: emailController,
-                            label: 'Email Address',
-                          ),
-                          const SizedBox(height: 15),
-                          buildTextFormField(
-                            keyboardType: TextInputType.visiblePassword,
-                            controller: passController,
-                            label: 'Password',
-                            obscureText: cubit.isPasswordVisible,
-                            suffixIcon:
-                                cubit.isPasswordVisible
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                            suffixTap: () {
-                              cubit.passwordVisibility();
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              const Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Spacer(),
-                              buildMaterialButton(
-                                icon: Icons.arrow_forward,
-                                onTap: () {
-                                  if (formKey.currentState!.validate()) {
-                                    cubit.register(
-                                      name: nameController.text,
-                                      email: emailController.text,
-                                      password: passController.text,
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              const Text(
-                                'Sign up With Google',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Spacer(),
-                              buildMaterialButton(
-                                icon: Icons.arrow_forward,
-                                onTap: () {},
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 25),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Already Have An Account?',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              buildTextButton(
-                                text: 'Login',
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/login');
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Welcome To Market',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 30),
+                    Card(
+                      margin: const EdgeInsets.all(24),
+                      color: AppColors.kWhiteColor,
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            buildTextFormField(
+                              keyboardType: TextInputType.text,
+                              controller: nameController,
+                              label: 'Name',
+                            ),
+                            const SizedBox(height: 15),
+                            buildTextFormField(
+                              keyboardType: TextInputType.emailAddress,
+                              controller: emailController,
+                              label: 'Email Address',
+                            ),
+                            const SizedBox(height: 15),
+                            buildTextFormField(
+                              keyboardType: TextInputType.visiblePassword,
+                              controller: passController,
+                              label: 'Password',
+                              obscureText: cubit.isPasswordVisible,
+                              suffixIcon:
+                                  cubit.isPasswordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                              suffixTap: () {
+                                cubit.passwordVisibility();
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Spacer(),
+                                if (state is! RegisterScreenLoading)
+                                  buildMaterialButton(
+                                    icon: Icons.arrow_forward,
+                                    onTap: () {
+                                      if (formKey.currentState!.validate()) {
+                                        cubit.register(
+                                          name: nameController.text,
+                                          email: emailController.text,
+                                          password: passController.text,
+                                        );
+                                      }
+                                    },
+                                  )
+                                else
+                                  CircularProgressIndicator(),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Sign up With Google',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Spacer(),
+                                if (state is! LoginWithGoogleLoading)
+                                  buildMaterialButton(
+                                    icon: Icons.arrow_forward,
+                                    onTap: () {
+                                      cubit.googleSignIn();
+                                    },
+                                  )
+                                else
+                                  CircularProgressIndicator(),
+                              ],
+                            ),
+                            const SizedBox(height: 25),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Already Have An Account?',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                buildTextButton(
+                                  text: 'Login',
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/login');
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

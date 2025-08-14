@@ -34,6 +34,23 @@ final class LoginWithGoogleError extends AppAuthStates {
   LoginWithGoogleError(this.error);
 }
 
+final class ResetPasswordLoading extends AppAuthStates {}
+
+final class ResetPasswordSuccess extends AppAuthStates {}
+
+final class ResetPasswordError extends AppAuthStates {
+  final String error;
+
+  ResetPasswordError(this.error);
+}
+
+final class AddUserDataSuccess extends AppAuthStates {}
+
+final class AddUserDataError extends AppAuthStates {
+  final String error;
+
+  AddUserDataError(this.error);
+}
 final class SignOutSuccess extends AppAuthStates {}
 
 final class SignOutError extends AppAuthStates {

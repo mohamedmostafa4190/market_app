@@ -46,9 +46,9 @@ class MyApp extends StatelessWidget {
         ),
         routes: route,
         home:
-            supabaseClient.auth.currentUser != null
-                ? MainHomeView()
-                : LoginView(),
+        supabaseClient.auth.currentUser != null
+            ? MainHomeView()
+            : LoginView(),
 
       ),
     );

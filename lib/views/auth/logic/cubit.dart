@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:market_app/core/constant.dart';
@@ -40,18 +41,10 @@ class AppAuthCubit extends Cubit<AppAuthStates> {
   }) async {
     emit(RegisterScreenLoading());
     try {
-      await supabaseClient.auth.signUp(email: email, password: password).then((
-        value,
-      ) async {
-        await supabaseClient.from('user').insert({
-          'id': value.user!.id,
-          'name': name,
-          'email': email,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-        log('User registered successfully: $name, $email');
-        emit(RegisterScreenSuccess());
-      });
+      await supabaseClient.auth.signUp(email: email, password: password);
+      await addUserData(email: email, name: name);
+      log('User registered successfully: $name, $email');
+      emit(RegisterScreenSuccess());
     } catch (e) {
       emit(RegisterScreenError(e.toString()));
       log(e.toString());
@@ -62,8 +55,6 @@ class AppAuthCubit extends Cubit<AppAuthStates> {
 
   Future<AuthResponse> googleSignIn() async {
     emit(LoginWithGoogleLoading());
-    const webClientId =
-        '20112591439-9455102e40cg3jv077hqnlj7kmns5nvh.apps.googleusercontent.com';
     final GoogleSignIn googleSignIn = GoogleSignIn(serverClientId: webClientId);
     final googleUser = await googleSignIn.signIn();
     if (googleUser == null) {
@@ -84,8 +75,37 @@ class AppAuthCubit extends Cubit<AppAuthStates> {
       idToken: idToken,
       accessToken: accessToken,
     );
+    await addUserData(email: googleUser.email, name: googleUser.displayName!);
     emit(LoginWithGoogleSuccess());
     return response;
+  }
+
+  Future<void> resetPassword(String email) async {
+    emit(ResetPasswordLoading());
+    try {
+      await supabaseClient.auth.resetPasswordForEmail(email);
+      emit(ResetPasswordSuccess());
+      log('Password reset email sent to $email');
+    } catch (e) {
+      emit(ResetPasswordError(e.toString()));
+      log('Error sending password reset email: $e');
+    }
+  }
+
+  Future<void> addUserData({
+    required String email,
+    required String name,
+  }) async {
+    try {
+      await supabaseClient.from('users').upsert({
+        "id": supabaseClient.auth.currentUser!.id,
+        "email": email,
+        "name": name,
+      });
+      emit(AddUserDataSuccess());
+    } catch (e) {
+      emit(AddUserDataError(e.toString()));
+    }
   }
 
   Future<void> signOut() async {

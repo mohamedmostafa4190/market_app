@@ -10,7 +10,7 @@ import '../views/profile/ui/profile_view.dart';
 
 Map<String, WidgetBuilder> route = {
   '/login': (context) => LoginView(),
-  '/forget': (context) => ForgetView(),
+  '/reset-password': (context) => ForgetView(),
   '/register': (context) => RegisterView(),
   '/home': (context) => MainHomeView(),
   '/profile': (context) => ProfileView(),
